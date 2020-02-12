@@ -2,14 +2,21 @@ package com.example.gastos
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.recyclerview.RecyclerAdapter
 import kotlinx.android.synthetic.main.activity_gastos.*
 
 
 class GastosActivity : AppCompatActivity() {
+
+    private val myAdapter : RecyclerAdapter = RecyclerAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +28,7 @@ class GastosActivity : AppCompatActivity() {
 
         usuarioLbl.text = "¡Hola ".plus(nombre.capitalize()).plus("!")
         ultimoAccesoLbl.text = "Último acceso: ".plus(ultimoAcceso)
+        setUpRecyclerView()
 
         anyadir.setOnClickListener{
             val builder =
@@ -68,5 +76,45 @@ class GastosActivity : AppCompatActivity() {
             val dialog = builder.create()
             dialog.show()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menu1, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId)
+        {
+            R.id.menu_eliminarGasto -> {
+                Toast.makeText(applicationContext, "Has elegido eliminar gasto", Toast.LENGTH_SHORT).show()
+                true
+            }
+            R.id.menu_eliminarCategoria -> {
+                Toast.makeText(applicationContext, "Has elegido eliminar categoría", Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun setUpRecyclerView(){
+
+        RVCuentas.setHasFixedSize(true)
+
+        RVCuentas.layoutManager = LinearLayoutManager(this)
+
+        myAdapter.RecyclerAdapter(getCourses(), this)
+
+        RVCuentas.adapter = myAdapter
+    }
+    private fun getCourses(): MutableList<Cuenta> {
+        val cuentas: MutableList<Cuenta> = arrayListOf()
+        //Cuentas de prueba
+        cuentas.add(Cuenta("1", "General", 1000.0))
+        cuentas.add(Cuenta("2", "Secundaria", 2300.45))
+        cuentas.add(Cuenta("3", "Boda", 10056.21))
+        return cuentas
     }
 }
