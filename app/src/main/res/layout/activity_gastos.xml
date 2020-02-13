@@ -6,50 +6,53 @@
     android:layout_height="match_parent"
     tools:context=".GastosActivity">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/usuarioImg"
+            android:layout_width="match_parent"
+            android:layout_height="108dp"
+            android:layout_marginTop="20dp"
+            android:contentDescription="@string/imagen_de_usuario"
+            app:srcCompat="@drawable/user" />
+
+        <TextView
+            android:id="@+id/usuarioLbl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginTop="15dp"
+            android:gravity="center"
+            android:text="@string/hola_usuario" />
 
-            <ImageView
-                android:id="@+id/usuarioImg"
-                android:layout_width="match_parent"
-                android:layout_height="108dp"
-                android:layout_marginTop="20dp"
-                android:contentDescription="@string/imagen_de_usuario"
-                app:srcCompat="@drawable/user" />
+        <TextView
+            android:id="@+id/ultimoAccesoLbl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="@string/ltimo_acceso"
+            android:textColor="#1176D3"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/usuarioLbl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:gravity="center"
-                android:text="@string/hola_usuario" />
-
-            <TextView
-                android:id="@+id/ultimoAccesoLbl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:gravity="center"
-                android:text="@string/ltimo_acceso"
-                android:textColor="#1176D3"
-                android:textStyle="bold" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="80dp">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/RVCuentas"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="40dp"
-                android:layout_marginBottom="80dp" />
+                android:layout_height="wrap_content" />
+        </ScrollView>
 
-        </LinearLayout>
-    </ScrollView>
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/anyadir"
