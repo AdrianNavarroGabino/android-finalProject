@@ -1,17 +1,20 @@
 package com.example.recyclerview
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gastos.Cuenta
+import com.example.gastos.CuentaActivity
 import com.example.gastos.R
 
-class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
+class RecyclerAdapterCuenta : RecyclerView.Adapter<RecyclerAdapterCuenta.ViewHolder>() {
     // Variables internes de la clase
     var cuentas: MutableList<Cuenta> = ArrayList()
     lateinit var context: Context
@@ -52,18 +55,36 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
             nombre.text = cuenta.nombre
             saldo.text = "%.2f".format(cuenta.saldo) + " €"
             itemView.setOnClickListener {
-                Toast.makeText(
-                    context,
-                    cuenta.nombre,
-                    Toast.LENGTH_SHORT
-                ).show()
+
+                val myIntent: Intent = Intent(it.context, CuentaActivity::class.java).apply {
+                    putExtra("id", cuenta._id)
+                }
+                it.context.startActivity(myIntent)
             }
             itemView.setOnLongClickListener{
-                Toast.makeText(
-                    context,
-                    "Click largo",
-                    Toast.LENGTH_SHORT
-                ).show()
+
+                val builder =
+                    AlertDialog.Builder(it.context)
+
+                val options: MutableList<String> = ArrayList()
+                options.add("Eliminar cuenta")
+
+                val dataAdapter = ArrayAdapter(
+                    it.context,
+                    android.R.layout.simple_dropdown_item_1line, options
+                )
+                builder.setAdapter(
+                    dataAdapter
+                ) { dialog, which ->
+                    when(which)
+                    {
+                        0 -> {
+                            Toast.makeText(it.context, "Eliminar", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                val dialog = builder.create()
+                dialog.show()
                 true
             }
         }

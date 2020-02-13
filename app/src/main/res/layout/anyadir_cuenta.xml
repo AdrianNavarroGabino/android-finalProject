@@ -13,7 +13,7 @@
         android:contentDescription="@string/app_name"/>
 
     <EditText
-        android:id="@+id/saldoCuenta"
+        android:id="@+id/nombreCuenta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
@@ -26,7 +26,7 @@
         tools:targetApi="o" />
 
     <EditText
-        android:id="@+id/saldo"
+        android:id="@+id/saldoCuenta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"

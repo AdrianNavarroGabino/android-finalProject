@@ -20,10 +20,11 @@ import java.text.SimpleDateFormat
 
 class MainActivity : AppCompatActivity() {
 
-    val db : FirebaseFirestore = FirebaseFirestore.getInstance()
+
     companion object {
         var idUsuario: String? = null
         val cuentasId = mutableListOf<String>()
+        val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

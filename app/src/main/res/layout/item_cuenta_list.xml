@@ -40,7 +40,7 @@
                 android:layout_marginRight="5dp"
                 android:layout_weight="1"
                 android:gravity="right"
-                android:text="Saldo" />
+                android:text="@string/saldo" />
         </LinearLayout>
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

@@ -10,13 +10,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.recyclerview.RecyclerAdapter
+import com.example.gastos.MainActivity.Companion.db
+import com.example.recyclerview.RecyclerAdapterCuenta
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.CollectionReference
 import kotlinx.android.synthetic.main.activity_gastos.*
+import kotlinx.android.synthetic.main.anyadir_cuenta.*
+import kotlinx.android.synthetic.main.login.*
+import java.text.SimpleDateFormat
 
 
 class GastosActivity : AppCompatActivity() {
 
-    private val myAdapter : RecyclerAdapter = RecyclerAdapter()
+    private val myAdapter : RecyclerAdapterCuenta = RecyclerAdapterCuenta()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +44,6 @@ class GastosActivity : AppCompatActivity() {
             val options: MutableList<String> = ArrayList()
             options.add("Añadir gasto")
             options.add("Añadir ingreso")
-            options.add("Añadir categoría")
             options.add("Añadir cuenta")
 
             val dataAdapter = ArrayAdapter(
@@ -51,20 +56,33 @@ class GastosActivity : AppCompatActivity() {
                 when(which)
                 {
                     0 -> {
-                        val myIntent = Intent(this, AnyadirGasto::class.java)
-                        startActivityForResult(myIntent, 1110)
+                        Toast.makeText(this, "Añadir gasto", Toast.LENGTH_SHORT).show()
                     }
                     1 -> {
-                        val myIntent = Intent(this, AnyadirGasto::class.java)
-                        startActivityForResult(myIntent, 1111)
+                        Toast.makeText(this, "Añadir ingreso", Toast.LENGTH_SHORT).show()
                     }
                     2 -> {
-                        val myIntent = Intent(this, AnyadirGasto::class.java)
-                        startActivityForResult(myIntent, 1112)
-                    }
-                    3 -> {
-                        val myIntent = Intent(this, AnyadirGasto::class.java)
-                        startActivityForResult(myIntent, 1113)
+                        val builder = android.app.AlertDialog.Builder(this)
+                        builder.apply {
+                            val inflater = layoutInflater
+                            setView(inflater.inflate(R.layout.anyadir_cuenta, null))
+                            setPositiveButton(android.R.string.ok) { dialog, _ ->
+                                val cuenta = hashMapOf(
+                                    "nombre" to (dialog as android.app.AlertDialog).nombreCuenta.text.toString(),
+                                    "saldo" to dialog.saldoCuenta.text.toString().toDouble()
+                                )
+
+                                db.collection("cuentas")
+                                    .add(cuenta)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(applicationContext, it.id + "", Toast.LENGTH_SHORT).show()
+                                    }
+                            }
+                            setNegativeButton(android.R.string.no) { dialog, _ ->
+                                dialog.dismiss()
+                            }
+                        }
+                        builder.show()
                     }
                 }
                 Toast.makeText(
@@ -105,11 +123,12 @@ class GastosActivity : AppCompatActivity() {
 
         RVCuentas.layoutManager = LinearLayoutManager(this)
 
-        myAdapter.RecyclerAdapter(getCourses(), this)
+        myAdapter.RecyclerAdapter(getCuentas(), this)
 
         RVCuentas.adapter = myAdapter
     }
-    private fun getCourses(): MutableList<Cuenta> {
+
+    private fun getCuentas(): MutableList<Cuenta> {
         val cuentas: MutableList<Cuenta> = arrayListOf()
         //Cuentas de prueba
         cuentas.add(Cuenta("1", "General", 1000.0))

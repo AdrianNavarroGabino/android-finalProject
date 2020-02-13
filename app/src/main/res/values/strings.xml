@@ -12,4 +12,5 @@
     <string name="nombre">Nombre</string>
     <string name="ltimo_acceso">Último acceso</string>
     <string name="a_adir_gasto">Añadir gasto</string>
+    <string name="saldo">Saldo</string>
 </resources>

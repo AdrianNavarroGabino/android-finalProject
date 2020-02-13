@@ -1,14 +1,12 @@
 package com.example.gastos
 
-class Cuenta {
+class Categoria {
     var _id: String? = null
     var nombre: String? = null
     var saldo: Double? = null
-    var categorias : MutableList<Categoria>? = null
     constructor(_id: String, nombre: String, saldo: Double) {
         this._id = _id
         this.nombre = nombre
         this.saldo = saldo
-        categorias = mutableListOf()
     }
 }
