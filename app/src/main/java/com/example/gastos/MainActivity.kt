@@ -7,24 +7,19 @@ import android.os.Bundle
 import android.widget.Toast
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.anyadir_cuenta.*
 import kotlinx.android.synthetic.main.login.*
 import kotlinx.android.synthetic.main.register.*
 import java.security.MessageDigest
-import java.text.SimpleDateFormat
 
 
 class MainActivity : AppCompatActivity() {
 
 
     companion object {
-        var idUsuario: String? = null
-        val cuentasId = mutableListOf<String>()
         val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+        var usuarioLogueado : Usuario? = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,23 +54,12 @@ class MainActivity : AppCompatActivity() {
                         .whereEqualTo("password", passLog)
                         .get().apply {
                             addOnSuccessListener {
+                                var usuarioCorrecto = false
                                 for (usuario in it) {
                                     if(usuario["correo"].toString().equals(correoLog))
                                     {
-                                        idUsuario = usuario.id
-                                        val refUpdTopic = db.collection("usuarios").document(idUsuario!!)
-
-                                        /*val usuarios: CollectionReference = db.collection("usuarios")
-                                        val docRef: DocumentReference = usuarios.document(idUsuario!!)
-
-                                        docRef.get().apply {
-                                            addOnSuccessListener {
-                                                for(a in (it["cuentas"] as List<String>))
-                                                {
-                                                    cuentasId.add(a)
-                                                }
-                                            }
-                                        }*/
+                                        usuarioCorrecto = true
+                                        val refUpdTopic = db.collection("usuarios").document(usuario.id!!)
 
                                         refUpdTopic
                                             .update(mapOf(
@@ -83,23 +67,34 @@ class MainActivity : AppCompatActivity() {
                                                 "accesoactual" to Timestamp.now()
                                             ))
                                             .addOnSuccessListener {
-                                                val pattern = "dd/MM/yyyy HH:mm"
-                                                val simpleDateFormat = SimpleDateFormat(pattern)
-                                                val fecha = simpleDateFormat.format((usuario!!["ultimoacceso"] as Timestamp).toDate())
-                                                val myIntent = Intent(applicationContext, GastosActivity::class.java).apply {
-                                                    putExtra("nombre", usuario["nombre"].toString())
-                                                    putExtra("correo", usuario["correo"].toString())
-                                                    putExtra("ultimoAcceso", fecha)
-                                                }
+                                                usuarioLogueado = Usuario(usuario.id as String,
+                                                    usuario["nombre"] as String,
+                                                    usuario["apellidos"] as String,
+                                                    usuario["correo"] as String,
+                                                    usuario["ultimoacceso"] as Timestamp,
+                                                    usuario["cuentas"] as MutableList<String>)
 
-                                                println((usuario["accesoactual"] as Timestamp).toDate())
+                                                val myIntent = Intent(applicationContext, GastosActivity::class.java)
 
                                                 startActivity(myIntent)
                                             }
                                     }
                                 }
+
+                                if(!usuarioCorrecto)
+                                {
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Correo y/o contraseña incorrectos",
+                                        Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
+                }
+                else
+                {
+                    Toast.makeText(applicationContext, "Rellene todos los campos", Toast.LENGTH_SHORT).show()
+                    dialog.show()
                 }
             }
             setNegativeButton(android.R.string.no) { dialog, _ ->
@@ -152,7 +147,7 @@ class MainActivity : AppCompatActivity() {
                                     db.collection("usuarios")
                                         .add(user)
                                         .addOnSuccessListener { a ->
-                                            idUsuario = a.id
+                                            Toast.makeText(applicationContext, "Usuario creado", Toast.LENGTH_SHORT).show()
                                             dialog.dismiss()
                                         }
                                         .addOnFailureListener{ _ ->
@@ -165,10 +160,25 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                         }
-
-
-
-
+                }
+                else
+                {
+                    if(!pass.equals(pass2))
+                    {
+                        Toast.makeText(
+                            applicationContext,
+                            "Las contraseñas no coinciden",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    else {
+                        Toast.makeText(
+                            applicationContext,
+                            "Rellene todos los campos",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    dialog.show()
                 }
             }
             setNegativeButton(android.R.string.no) { dialog, _ ->
@@ -198,72 +208,11 @@ class MainActivity : AppCompatActivity() {
         }
         return r.toString()
     }
+
+    override fun onBackPressed() {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_HOME)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+    }
 }
-
-
-/*
-                val builder2 = AlertDialog.Builder(applicationContext)
-                builder2.apply {
-                    val inflater2 = layoutInflater
-                    setView(inflater2.inflate(R.layout.anyadir_cuenta, null))
-                    setPositiveButton(android.R.string.ok) { dialog2, _ ->
-
-
-
-
-                        val nombreCuenta = (dialog2 as AlertDialog).nombreCuenta.text.toString()
-                        val saldoAux = dialog2.saldo.text.toString()
-
-                        if (nombreCuenta.isNotEmpty() && saldoAux.isNotEmpty())
-                        {
-                            val saldo = saldoAux.toDouble()
-                            var idCuenta : String? = null
-                            val cuentas: CollectionReference = db.collection("cuentas")
-                            var cuentaEncontrada = false
-
-                            cuentas
-                                .whereEqualTo("nombre", nombreCuenta)
-                                .get().apply {
-                                    addOnSuccessListener {
-                                        for(cuenta in it)
-                                        {
-                                            if(cuenta["nombre"].toString().equals(nombreCuenta))
-                                            {
-                                                cuentaEncontrada = true
-                                            }
-                                        }
-
-                                        if(!cuentaEncontrada)
-                                        {
-                                            val cuenta = hashMapOf(
-                                                "nombre" to nombreCuenta,
-                                                "saldo" to saldo)
-
-                                            db.collection("cuentas")
-                                                .add(cuenta)
-                                                .addOnSuccessListener { a ->
-                                                    idCuenta = a.id
-
-                                                    val refUpdTopic = db.collection("users").document(idUsuario!!)
-
-                                                    refUpdTopic
-                                                        .update("cuentas",  FieldValue.arrayUnion(idCuenta))
-                                                        .addOnSuccessListener {
-                                                            dialog2.dismiss()
-                                                        }
-                                                }
-                                                .addOnFailureListener{ _ ->
-                                                    Toast.makeText(applicationContext, "Error añadiendo cuenta", Toast.LENGTH_SHORT).show()
-                                                }
-                                        }
-                                        else
-                                        {
-                                            Toast.makeText(applicationContext, "La cuenta ya existe", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                }
-                        }
-                    }
-                }
-                builder2.show()
- */

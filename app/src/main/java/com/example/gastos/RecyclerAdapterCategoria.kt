@@ -7,25 +7,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import com.example.gastos.GastosActivity.Companion.cuentaSeleccionada
 
 class RecyclerAdapterCategoria : RecyclerView.Adapter<RecyclerAdapterCategoria.ViewHolder>() {
-    // Variables internes de la clase
+
     var categorias: MutableList<Categoria> = ArrayList()
     lateinit var context: Context
-    // Constructor de la clase
+
     fun RecyclerAdapter(categorias: MutableList<Categoria>, context: Context) {
         this.categorias = categorias
         this.context = context
     }
-    // Este método se encarga de pasar los objetos al ViewHolder
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = categorias.get(position)
         holder.bind(item, context)
     }
-    // Es el encargado de devolver el ViewHolder ya configurado
+
     override fun onCreateViewHolder(
         parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -35,32 +35,30 @@ class RecyclerAdapterCategoria : RecyclerView.Adapter<RecyclerAdapterCategoria.V
             )
         )
     }
-    // Devuelve el tamaño del array
+
     override fun getItemCount(): Int {
         return categorias.size
     }
-    // Esta clase se encarga de rellenar cada una de las vistas que
-    // se inflarán en el RecyclerView
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        // Aquí es necesario utilizar findViewById para localizar el elemento
-        // de la vista que se pasa como parámetro
+
         private val nombre = view.findViewById(
             R.id.nombreCategoria) as TextView
         private val saldo = view.findViewById(
             R.id.saldoCategoria) as TextView
-        fun bind(cuenta: Categoria, context: Context){
-            nombre.text = cuenta.nombre
-            saldo.text = "%.2f".format(cuenta.saldo) + " €"
-            itemView.setOnLongClickListener{
+        fun bind(categoria: Categoria, context: Context){
+            nombre.text = categoria.nombre
+            saldo.text = "%.2f".format(categoria.saldo) + " €"
+            itemView.setOnLongClickListener{v ->
 
                 val builder =
-                    AlertDialog.Builder(it.context)
+                    AlertDialog.Builder(v.context)
 
                 val options: MutableList<String> = ArrayList()
                 options.add("Eliminar categoria")
 
                 val dataAdapter = ArrayAdapter(
-                    it.context,
+                    v.context,
                     android.R.layout.simple_dropdown_item_1line, options
                 )
                 builder.setAdapter(
@@ -69,7 +67,47 @@ class RecyclerAdapterCategoria : RecyclerView.Adapter<RecyclerAdapterCategoria.V
                     when(which)
                     {
                         0 -> {
-                            Toast.makeText(it.context, "Eliminar", Toast.LENGTH_SHORT).show()
+                            val builder = AlertDialog.Builder(v.context)
+                            builder.setTitle("Eliminar categoría")
+                            builder.setMessage("¿Estás seguro que quieres eliminar la categoría?")
+                            builder.setPositiveButton(android.R.string.yes){_, _ ->
+                                MainActivity.db.collection("categorias").document(categoria._id!!).get().apply {
+                                    addOnSuccessListener { c ->
+
+                                        var pvp = -(categoria!!.saldo!!)
+
+                                        for(i in CuentaActivity.categorias)
+                                        {
+                                            pvp += i.saldo!!
+                                        }
+
+                                        MainActivity.db.collection("cuentas")
+                                            .document(cuentaSeleccionada!!._id!!)
+                                            .update("saldo", pvp)
+
+                                        MainActivity.db.collection("cuentas").document(cuentaSeleccionada!!._id!!).get().apply {
+                                            addOnSuccessListener {
+                                                val categoriasCuentas = it["categorias"] as MutableList<String>
+                                                categoriasCuentas.remove(categoria._id!!)
+                                                MainActivity.db.collection("cuentas")
+                                                    .document(cuentaSeleccionada!!._id!!)
+                                                    .update("categorias", categoriasCuentas)
+                                                    .addOnSuccessListener {
+                                                        val myIntent = Intent(v.context, CuentaActivity::class.java)
+                                                        v.context.startActivity(myIntent)
+                                                    }
+                                            }
+                                        }
+
+                                        MainActivity.db.collection("categorias").document(cuentaSeleccionada!!._id!!).delete()
+                                            .addOnSuccessListener {
+                                                CuentaActivity.categorias.remove(categoria)
+                                            }
+                                    }
+                                }
+                            }
+                            builder.setNegativeButton(android.R.string.no, null)
+                            builder.show()
                         }
                     }
                 }

@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="#000000"
+        android:backgroundTint="#009688"
         android:clickable="true"
         android:focusable="true"
         android:soundEffectsEnabled="false"

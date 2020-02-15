@@ -9,8 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CuentaActivity"></activity>
+        <activity android:name=".RealizarTraspaso"></activity>
         <activity android:name=".AnyadirGasto" />
+        <activity android:name=".CuentaActivity" />
         <activity android:name=".GastosActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

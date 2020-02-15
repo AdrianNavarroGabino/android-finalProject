@@ -13,4 +13,13 @@
     <string name="ltimo_acceso">Último acceso</string>
     <string name="a_adir_gasto">Añadir gasto</string>
     <string name="saldo">Saldo</string>
+    <string name="categor_as">Categorías</string>
+    <string name="a_adir">Añadir</string>
+    <string name="efectivo">Efectivo</string>
+    <string name="iniciar_sesi_n">Iniciar sesión</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="traspaso">Traspaso</string>
+    <string name="title">🄶🄰🅂🅃🄾🅂</string>
+    <string name="realizar">Realizar</string>
 </resources>
