@@ -111,6 +111,22 @@ class GastosActivity : AppCompatActivity() {
                                     db.collection("cuentas")
                                         .add(cuenta)
                                         .addOnSuccessListener { cuentaCreada ->
+
+                                            val categoria = hashMapOf(
+                                                "nombre" to "No asignado",
+                                                "saldo" to dialog.saldoCuenta.text.toString().toDouble()
+                                            )
+
+                                            db.collection("categorias")
+                                                .add(categoria)
+                                                .addOnSuccessListener { cat ->
+
+                                                    val idCategoriaUpdate = listOf<String>(cat.id)
+                                                    db.collection("cuentas")
+                                                        .document(cuentaCreada.id)
+                                                        .update("categorias", idCategoriaUpdate)
+                                                }
+
                                             db.collection("usuarios")
                                                 .document(usuarioLogueado!!._id!!).get().apply {
                                                 addOnSuccessListener {
